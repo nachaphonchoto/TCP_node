@@ -24,45 +24,33 @@ server.on('connection', (socket) => {
 
   socket.on('data', (data) => {
     sockets.forEach((sock) => {
-      sock.write(`${data} connected!`);
+      sock.socket.write(`${data} connected!`);
     });
-    sockets.push(socket);
-    connected.push({
-      address: socket.remoteAddress,
-      port: socket.remotePort,
-      data: data,
-    });
+    sockets.push({socket: socket, data: data});
   });
 
   socket.on('close', () => {
     var name;
 
     var index = sockets.findIndex((o) => {
+        if (
+            o.socket.remoteAddress === socket.remoteAddress &&
+            o.socket.remotePort === socket.remotePort
+        ) {
+            name = o.data;
+        }
       return (
-        o.remoteAddress === socket.remoteAddress &&
-        o.remotePort === socket.remotePort
-      );
-    });
-
-    var temp = connected.findIndex((o) => {
-      if (
-        o.address === socket.remoteAddress &&
-        o.port === socket.remotePort
-      ) {
-        name = o.data;
-      }
-      return (
-        o.address === socket.remoteAddress && o.port === socket.remotePort
+        o.socket.remoteAddress === socket.remoteAddress &&
+        o.socket.remotePort === socket.remotePort
       );
     });
 
     if (index !== -1) {
       sockets.splice(index, 1);
       sockets.forEach((sock) => {
-        sock.write(`${name} disconnected\n`);
+        sock.socket.write(`${name} disconnected ;-;`);
       });
     }
-    if (temp !== -1) connected.splice(temp, 1);
 
     console.log(`connection closed: ${clientAddress}`);
   });
