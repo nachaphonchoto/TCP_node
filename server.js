@@ -12,7 +12,6 @@ server.on('listening', () => {
 server.listen(PORT, HOST);
 
 const sockets = [];
-const connected = [];
 
 server.on('connection', (socket) => {
   try {
